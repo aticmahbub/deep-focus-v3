@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Deep Focus</title>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,300;0,400;0,700;1,400&family=DM+Mono:wght@400;500&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="css/base.css" />
+        <link rel="stylesheet" href="css/layout.css" />
+        <link rel="stylesheet" href="css/timer.css" />
+        <link rel="stylesheet" href="css/tasks.css" />
+    </head>
+    <body>
+        <div class="toast" id="toast"></div>
+
+        <!-- TOPBAR -->
+        <div class="topbar-wrap">
+            <div class="topbar">
+                <div class="brand">
+                    <div class="brand-dot"></div>
+                    <div class="brand-name">Deep<em>Focus</em></div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 14px">
+                    <button
+                        class="reset-all-btn"
+                        onclick="hardReset()"
+                        title="Reset everything"
+                    >
+                        ⟳
+                    </button>
+                    <div
+                        class="theme-toggle"
+                        onclick="toggleTheme()"
+                        title="Switch theme"
+                    >
+                        <span class="theme-toggle-label" id="themeLabel"
+                            >e-ink</span
+                        >
+                        <div class="toggle-track">
+                            <div class="toggle-thumb"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="topbar-right">
+                    <div class="topbar-date" id="topDate"></div>
+                    <div class="topbar-bismillah">
+                        بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- APP -->
+        <div class="app">
+            <!-- TIMER -->
+            <div class="timer-section">
+                <div class="timer-card" id="timerCard">
+                    <div class="break-badge" id="breakBadge">Break</div>
+                    <div class="clock-wrap">
+                        <div class="clock-ring" id="clockRing">
+                            <svg viewBox="0 0 100 100">
+                                <circle
+                                    class="ring-bg"
+                                    cx="50"
+                                    cy="50"
+                                    r="44"
+                                />
+                                <circle
+                                    class="ring-fill"
+                                    id="ringFill"
+                                    cx="50"
+                                    cy="50"
+                                    r="44"
+                                    stroke-dasharray="276.46"
+                                    stroke-dashoffset="0"
+                                    stroke="#444444"
+                                />
+                            </svg>
+                            <div class="clock-inner">
+                                <div class="clock-time" id="clockTime">
+                                    50:00
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pom-dots" id="pomDots"></div>
+                    </div>
+                    <div class="timer-controls">
+                        <button
+                            class="adj-btn"
+                            onclick="adjustTime(-10)"
+                            title="−10 min"
+                        >
+                            ◀
+                        </button>
+                        <div class="adj-center">
+                            <span id="adjLabel">50 min</span>
+                        </div>
+                        <button
+                            class="adj-btn"
+                            onclick="adjustTime(+10)"
+                            title="+10 min"
+                        >
+                            ▶
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LISTS -->
+            <div class="lists-section">
+                <!-- TODOS -->
+                <div class="todo-card">
+                    <div class="todo-head">
+                        <div class="todo-title">Tasks</div>
+                    </div>
+                    <div
+                        class="nn-sub"
+                        style="
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                        "
+                    >
+                        <span>Your session to-dos</span>
+                        <span
+                            id="todoCount"
+                            style="color: var(--muted); font-size: 11px"
+                            >—</span
+                        >
+                    </div>
+                    <div class="todo-add">
+                        <input
+                            type="text"
+                            class="todo-input"
+                            id="todoInput"
+                            placeholder="Add a task..."
+                            onkeydown="if (event.key === 'Enter') addTodo();"
+                        />
+                        <button class="todo-add-btn" onclick="addTodo()">
+                            +
+                        </button>
+                    </div>
+                    <div class="todo-list" id="todoList"></div>
+                    <div class="todo-footer">
+                        <div class="prog">
+                            <div
+                                class="prog-fill"
+                                id="progFill"
+                                style="width: 0%"
+                            ></div>
+                        </div>
+                        <div class="prog-txt" id="progTxt">0 tasks</div>
+                        <button class="clear-btn" onclick="clearDone()">
+                            Clear done
+                        </button>
+                    </div>
+                </div>
+
+                <!-- NON-NEGOTIABLES -->
+                <div class="nn-card">
+                    <div class="nn-head">
+                        <div class="nn-title">Non-Negotiables</div>
+                    </div>
+                    <div
+                        class="nn-sub"
+                        style="
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                        "
+                    >
+                        <span id="nnResetBadge">Resets daily at midnight</span>
+                        <span id="nnStreak" class="nn-streak"></span>
+                    </div>
+                    <div class="nn-add">
+                        <input
+                            type="text"
+                            class="nn-input"
+                            id="nnInput"
+                            placeholder="Add a daily non-negotiable..."
+                            onkeydown="if (event.key === 'Enter') addNN();"
+                        />
+                        <button class="nn-add-btn" onclick="addNN()">+</button>
+                    </div>
+                    <div class="nn-list" id="nnList"></div>
+                    <div class="nn-footer">
+                        <div class="nn-prog">
+                            <div
+                                class="nn-prog-fill"
+                                id="nnProgFill"
+                                style="width: 0%"
+                            ></div>
+                        </div>
+                        <div class="nn-prog-txt" id="nnProgTxt">0 items</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- INSIGHTS -->
+        <section class="insights">
+            <div class="insights-divider">
+                <div class="insights-divider-line"></div>
+                <div class="insights-divider-label">
+                    Six Elements of Effective Deep Work
+                </div>
+                <div class="insights-divider-line"></div>
+            </div>
+            <div class="insights-grid">
+                <div class="ic">
+                    <div class="ic-n">01</div>
+                    <div class="ic-title">Have a Deliberate Trigger</div>
+                    <div class="ic-body">
+                        Have a clear signal that tells you it's time to focus.
+                        It could be a specific place, time, or small habit you
+                        do before starting. Don't overthink it. Notice what you
+                        already do before working and turn that into your
+                        starting ritual.
+                    </div>
+                </div>
+                <div class="ic">
+                    <div class="ic-n">02</div>
+                    <div class="ic-title">Cultivate Focused Attention</div>
+                    <div class="ic-body">
+                        Give yourself real mental space to focus. Don't
+                        multitask. Work on one important task at a time and stay
+                        fully present with it. You're capable of deeper focus
+                        than you think.
+                    </div>
+                </div>
+                <div class="ic">
+                    <div class="ic-n">03</div>
+                    <div class="ic-title">Establish a Time Limit</div>
+                    <div class="ic-body">
+                        Set a clear time limit for your session. A fixed time
+                        block protects you from distractions. It could be a
+                        Pomodoro session or a 90-minute focus block.
+                    </div>
+                </div>
+                <div class="ic">
+                    <div class="ic-n">04</div>
+                    <div class="ic-title">Make It Output-Oriented</div>
+                    <div class="ic-body">
+                        Your session should produce real results. Don't just
+                        spend time — make progress. By the end, you should have
+                        something concrete: a draft, a solved problem, or a
+                        clear insight.
+                    </div>
+                </div>
+                <div class="ic">
+                    <div class="ic-n">05</div>
+                    <div class="ic-title">Mitigate Potential Distractions</div>
+                    <div class="ic-body">
+                        Reduce distractions in advance. This can mean writing
+                        down distracting thoughts, blocking apps, or setting up
+                        a clean workspace. Mental, digital, and physical
+                        distractions all matter.
+                    </div>
+                </div>
+                <div class="ic">
+                    <div class="ic-n">06</div>
+                    <div class="ic-title">
+                        Establish a Rhythm of Accountability
+                    </div>
+                    <div class="ic-body">
+                        Weekly reviews let you reflect, adapt, and recommit.
+                        Without accountability, deep work devolves into wishful
+                        thinking. Structured audits keep goal alignment honest.
+                    </div>
+                </div>
+            </div>
+
+            <div class="insights-divider" style="margin-top: 28px">
+                <div class="insights-divider-line"></div>
+                <div class="insights-divider-label">Deep Work Rules</div>
+                <div class="insights-divider-line"></div>
+            </div>
+            <div class="dd-grid">
+                <div class="dd-card dos">
+                    <div class="dd-label">Do's</div>
+                    <div class="dd-sub">
+                        Build habits that help you stay focused and keep
+                        momentum.
+                    </div>
+                    <ul class="dd-list">
+                        <li>Work on one important task at a time.</li>
+                        <li>Plan ahead so you can protect your focus time.</li>
+                        <li>
+                            Start each session with a small ritual that signals
+                            it's time to concentrate.
+                        </li>
+                        <li>
+                            Track your progress and reflect regularly to
+                            improve.
+                        </li>
+                        <li>
+                            Set up a clean workspace that reduces distractions.
+                        </li>
+                    </ul>
+                </div>
+                <div class="dd-card donts">
+                    <div class="dd-label">Don'ts</div>
+                    <div class="dd-sub">
+                        Avoid common mistakes that weaken your focus and
+                        results.
+                    </div>
+                    <ul class="dd-list">
+                        <li>
+                            Don't switch between tools or multitask during a
+                            session.
+                        </li>
+                        <li>
+                            Don't rely only on willpower. Deep work needs
+                            structure, not just discipline.
+                        </li>
+                        <li>
+                            Avoid busywork that feels productive but doesn't
+                            create real results.
+                        </li>
+                        <li>
+                            Don't overwork yourself. Rest is part of the
+                            process.
+                        </li>
+                        <li>
+                            Focus on being consistent instead of trying to be
+                            perfect from day one.
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <footer class="atic-footer">
+            <span>Deep Work ideas by</span>
+            <span class="atic-name">Cal Newport</span>
+            <span>·</span>
+            <span>Made by</span>
+            <span class="atic-name">Atic</span>
+        </footer>
+
+        <!-- JS modules — order matters -->
+        <script src="js/api.js"></script>
+        <script src="js/sound.js"></script>
+        <script src="js/timer.js"></script>
+        <script src="js/todos.js"></script>
+        <script src="js/nn.js"></script>
+        <script src="js/main.js"></script>
+    </body>
+</html>

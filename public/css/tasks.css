@@ -1,0 +1,242 @@
+/* ── SHARED CARD BASE ── */
+.todo-card,
+.nn-card {
+    background: var(--s1);
+    border: 1px solid var(--border);
+    border-top: 2px solid var(--accent);
+    border-radius: 16px;
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ── TODO ── */
+.todo-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 6px;
+}
+.todo-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+.todo-count { font-size: 11px; color: var(--muted); }
+
+/* ── NN ── */
+.nn-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 6px;
+}
+.nn-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+.nn-meta { display: flex; align-items: center; gap: 10px; }
+.nn-reset-badge { font-size: 10px; color: var(--muted); letter-spacing: 0.1em; white-space: nowrap; }
+
+.nn-sub {
+    font-size: 11px;
+    color: var(--dim);
+    margin-bottom: 16px;
+    letter-spacing: 0.05em;
+}
+
+/* ── INPUT ROW (shared style) ── */
+.todo-add,
+.nn-add {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    background: var(--s2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 4px 4px 4px 14px;
+    transition: border-color 0.2s;
+}
+.nn-add { margin-bottom: 14px; }
+
+.todo-add:focus-within,
+.nn-add:focus-within { border-color: rgba(240, 240, 240, 0.2); }
+
+.todo-input,
+.nn-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    padding: 8px 0;
+    outline: none;
+}
+.todo-input::placeholder,
+.nn-input::placeholder { color: var(--muted); }
+
+.todo-add-btn,
+.nn-add-btn {
+    width: 36px;
+    height: 36px;
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    border-radius: 7px;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.15s;
+    line-height: 1;
+    align-self: center;
+}
+.todo-add-btn:hover,
+.nn-add-btn:hover { background: #ffffff; }
+
+/* ── LISTS ── */
+.todo-list,
+.nn-list {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    overflow-y: auto;
+    flex: 1;
+    padding-right: 2px;
+}
+
+/* ── ITEMS ── */
+.todo-item,
+.nn-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 13px;
+    background: var(--s2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    transition: border-color 0.2s, opacity 0.3s;
+    animation: fadeIn 0.2s ease;
+}
+.todo-item:hover,
+.nn-item:hover { border-color: var(--dim); }
+
+.todo-item.done,
+.nn-item.done  { opacity: 0.4; }
+
+.todo-item.done .todo-text,
+.nn-item.done .nn-text { text-decoration: line-through; }
+
+/* Checkbox */
+.check,
+.nn-check {
+    width: 18px;
+    height: 18px;
+    border-radius: 5px;
+    border: 1.5px solid var(--dim);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: transparent;
+}
+.todo-item.done .check,
+.nn-item.done .nn-check {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--bg);
+}
+
+.todo-text,
+.nn-text {
+    flex: 1;
+    font-size: 13px;
+    line-height: 1.4;
+    color: var(--text);
+}
+
+.del-btn,
+.nn-del {
+    width: 26px;
+    height: 26px;
+    background: none;
+    border: none;
+    color: var(--dim);
+    font-size: 13px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: color 0.15s;
+}
+.del-btn:hover,
+.nn-del:hover { color: var(--red); }
+
+/* ── FOOTERS ── */
+.todo-footer,
+.nn-footer {
+    margin-top: 13px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.prog,
+.nn-prog {
+    flex: 1;
+    height: 2px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+}
+.prog-fill,
+.nn-prog-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width 0.4s ease;
+}
+.prog-txt,
+.nn-prog-txt {
+    font-size: 11px;
+    color: var(--muted);
+    white-space: nowrap;
+}
+
+.clear-btn {
+    font-size: 11px;
+    color: var(--dim);
+    cursor: pointer;
+    background: none;
+    border: none;
+    font-family: 'DM Mono', monospace;
+    transition: color 0.15s;
+}
+.clear-btn:hover { color: var(--red); }
+
+/* Streak badge */
+.nn-streak {
+    font-size: 11px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.nn-streak-num { color: var(--accent); font-weight: 600; }
+
+/* Mobile */
+@media (max-width: 720px) {
+    .todo-card { padding: 16px; }
+    .todo-title { font-size: 1rem; }
+    .todo-input { font-size: 12px; }
+}

@@ -1,8 +1,17 @@
 const express = require('express');
 const router = express.Router();
-
-// Import the model the same way other routes do
 const {RoutineEntry} = require('../models');
+
+// DEBUG — get all entries (limited to 10)
+router.get('/debug', async (req, res) => {
+    try {
+        const total = await RoutineEntry.countDocuments({});
+        const sample = await RoutineEntry.find({}).limit(5).sort({date: 1});
+        res.json({total, sample});
+    } catch (err) {
+        res.status(500).json({error: err.message});
+    }
+});
 
 // GET /api/routine/:batch/range?from=YYYY-MM-DD&to=YYYY-MM-DD
 router.get('/:batch/range', async (req, res) => {
@@ -23,7 +32,7 @@ router.get('/:batch/range', async (req, res) => {
     }
 });
 
-// GET /api/routine/:batch/window — returns prev, today, next2
+// GET /api/routine/:batch/window
 router.get('/:batch/window', async (req, res) => {
     try {
         const {batch} = req.params;
@@ -45,7 +54,7 @@ router.get('/:batch/window', async (req, res) => {
             date: {$gte: fromDate, $lte: toDate},
         }).sort({date: 1});
 
-        res.json({today: todayStr, entries});
+        res.json({today: todayStr, fromDate, toDate, entries});
     } catch (err) {
         res.status(500).json({error: err.message});
     }

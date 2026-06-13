@@ -25,8 +25,11 @@ const nnSchema = new mongoose.Schema({
     createdAt: {type: Date, default: Date.now},
 });
 
+const RoutineEntry = require('./routine');
+
 module.exports = {
     Session: mongoose.model('Session', sessionSchema),
     Todo: mongoose.model('Todo', todoSchema),
     NN: mongoose.model('NN', nnSchema),
+    RoutineEntry,
 };

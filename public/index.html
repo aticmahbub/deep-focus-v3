@@ -12,6 +12,7 @@
         <link rel="stylesheet" href="css/layout.css" />
         <link rel="stylesheet" href="css/timer.css" />
         <link rel="stylesheet" href="css/tasks.css" />
+        <link rel="stylesheet" href="css/routine.css" />
     </head>
     <body>
         <div class="toast" id="toast"></div>
@@ -54,9 +55,10 @@
         </div>
 
         <!-- APP -->
-        <div class="app">
-            <!-- TIMER -->
-            <div class="timer-section">
+        <!-- APP -->
+        <div class="main-section">
+            <!-- LEFT: TIMER -->
+            <div class="timer-col">
                 <div class="timer-card" id="timerCard">
                     <div class="break-badge" id="breakBadge">Break</div>
                     <div class="clock-wrap">
@@ -109,92 +111,128 @@
                 </div>
             </div>
 
-            <!-- LISTS -->
-            <div class="lists-section">
-                <!-- TODOS -->
-                <div class="todo-card">
-                    <div class="todo-head">
-                        <div class="todo-title">Tasks</div>
-                    </div>
-                    <div
-                        class="nn-sub"
-                        style="
-                            display: flex;
-                            justify-content: space-between;
-                            align-items: center;
-                        "
-                    >
-                        <span>Your session to-dos</span>
-                        <span
-                            id="todoCount"
-                            style="color: var(--muted); font-size: 11px"
-                            >—</span
-                        >
-                    </div>
-                    <div class="todo-add">
-                        <input
-                            type="text"
-                            class="todo-input"
-                            id="todoInput"
-                            placeholder="Add a task..."
-                            onkeydown="if (event.key === 'Enter') addTodo();"
-                        />
-                        <button class="todo-add-btn" onclick="addTodo()">
-                            +
-                        </button>
-                    </div>
-                    <div class="todo-list" id="todoList"></div>
-                    <div class="todo-footer">
-                        <div class="prog">
-                            <div
-                                class="prog-fill"
-                                id="progFill"
-                                style="width: 0%"
-                            ></div>
+            <!-- RIGHT COL -->
+            <div class="right-col">
+                <!-- ROUTINE -->
+                <div class="routine-card">
+                    <div class="routine-head">
+                        <div class="routine-title">BCS Routine</div>
+                        <div class="rtn-toggle">
+                            <button
+                                class="rtn-btn active"
+                                id="rtnBtnPreli"
+                                onclick="switchBatch('preli')"
+                            >
+                                Preli
+                            </button>
+                            <button
+                                class="rtn-btn"
+                                id="rtnBtnWritten"
+                                onclick="switchBatch('written')"
+                            >
+                                Written
+                            </button>
                         </div>
-                        <div class="prog-txt" id="progTxt">0 tasks</div>
-                        <button class="clear-btn" onclick="clearDone()">
-                            Clear done
-                        </button>
                     </div>
+                    <div class="rtn-sub">Previous · Today · Next 2 days</div>
+                    <div class="rtn-list" id="routineList"></div>
                 </div>
 
-                <!-- NON-NEGOTIABLES -->
-                <div class="nn-card">
-                    <div class="nn-head">
-                        <div class="nn-title">Non-Negotiables</div>
-                    </div>
-                    <div
-                        class="nn-sub"
-                        style="
-                            display: flex;
-                            justify-content: space-between;
-                            align-items: center;
-                        "
-                    >
-                        <span id="nnResetBadge">Resets daily at midnight</span>
-                        <span id="nnStreak" class="nn-streak"></span>
-                    </div>
-                    <div class="nn-add">
-                        <input
-                            type="text"
-                            class="nn-input"
-                            id="nnInput"
-                            placeholder="Add a daily non-negotiable..."
-                            onkeydown="if (event.key === 'Enter') addNN();"
-                        />
-                        <button class="nn-add-btn" onclick="addNN()">+</button>
-                    </div>
-                    <div class="nn-list" id="nnList"></div>
-                    <div class="nn-footer">
-                        <div class="nn-prog">
-                            <div
-                                class="nn-prog-fill"
-                                id="nnProgFill"
-                                style="width: 0%"
-                            ></div>
+                <!-- LISTS -->
+                <div class="lists-section">
+                    <!-- TODOS -->
+                    <div class="todo-card">
+                        <div class="todo-head">
+                            <div class="todo-title">Tasks</div>
                         </div>
-                        <div class="nn-prog-txt" id="nnProgTxt">0 items</div>
+                        <div
+                            class="nn-sub"
+                            style="
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: center;
+                            "
+                        >
+                            <span>Your session to-dos</span>
+                            <span
+                                id="todoCount"
+                                style="color: var(--muted); font-size: 11px"
+                                >—</span
+                            >
+                        </div>
+                        <div class="todo-add">
+                            <input
+                                type="text"
+                                class="todo-input"
+                                id="todoInput"
+                                placeholder="Add a task..."
+                                onkeydown="
+                                    if (event.key === 'Enter') addTodo();
+                                "
+                            />
+                            <button class="todo-add-btn" onclick="addTodo()">
+                                +
+                            </button>
+                        </div>
+                        <div class="todo-list" id="todoList"></div>
+                        <div class="todo-footer">
+                            <div class="prog">
+                                <div
+                                    class="prog-fill"
+                                    id="progFill"
+                                    style="width: 0%"
+                                ></div>
+                            </div>
+                            <div class="prog-txt" id="progTxt">0 tasks</div>
+                            <button class="clear-btn" onclick="clearDone()">
+                                Clear done
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- NON-NEGOTIABLES -->
+                    <div class="nn-card">
+                        <div class="nn-head">
+                            <div class="nn-title">Non-Negotiables</div>
+                        </div>
+                        <div
+                            class="nn-sub"
+                            style="
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: center;
+                            "
+                        >
+                            <span id="nnResetBadge"
+                                >Resets daily at midnight</span
+                            >
+                            <span id="nnStreak" class="nn-streak"></span>
+                        </div>
+                        <div class="nn-add">
+                            <input
+                                type="text"
+                                class="nn-input"
+                                id="nnInput"
+                                placeholder="Add a daily non-negotiable..."
+                                onkeydown="if (event.key === 'Enter') addNN();"
+                            />
+                            <button class="nn-add-btn" onclick="addNN()">
+                                +
+                            </button>
+                        </div>
+                        <div class="nn-list" id="nnList"></div>
+                        <div class="nn-footer">
+                            <div class="nn-prog">
+                                <div
+                                    class="nn-prog-fill"
+                                    id="nnProgFill"
+                                    style="width: 0%"
+                                ></div>
+                            </div>
+                            <div class="nn-prog-txt" id="nnProgTxt">
+                                0 items
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -347,6 +385,7 @@
         <script src="js/timer.js"></script>
         <script src="js/todos.js"></script>
         <script src="js/nn.js"></script>
+        <script src="js/routine.js"></script>
         <script src="js/main.js"></script>
     </body>
 </html>

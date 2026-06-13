@@ -1,8 +1,21 @@
 // ── DATE ──
 (function setDate() {
-    const d      = new Date();
-    const days   = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const d = new Date();
+    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const months = [
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'May',
+        'Jun',
+        'Jul',
+        'Aug',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Dec',
+    ];
     document.getElementById('topDate').textContent =
         `${days[d.getDay()]} · ${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
 })();
@@ -19,8 +32,10 @@ function showToast(msg, duration = 3500) {
 // ── THEME ──
 function toggleTheme() {
     const isGreen = document.body.classList.toggle('theme-green');
-    document.getElementById('themeLabel').textContent = isGreen ? 'green' : 'e-ink';
-    api('PATCH', `/session/${deviceId}`, { theme: isGreen ? 'green' : 'eink' });
+    document.getElementById('themeLabel').textContent = isGreen
+        ? 'green'
+        : 'e-ink';
+    api('PATCH', `/session/${deviceId}`, {theme: isGreen ? 'green' : 'eink'});
     renderClock();
 }
 
@@ -28,15 +43,15 @@ function toggleTheme() {
 async function hardReset() {
     if (!confirm('Reset everything — timer, pomodoros and tasks?')) return;
     clearInterval(timerInt);
-    running   = false;
+    running = false;
     timerEndAt = 0;
     stopAlarm();
-    pomCount  = 0;
-    todos     = [];
-    nnItems   = nnItems.map((i) => ({ ...i, done: false }));
-    nnStreak  = 0;
-    mode      = 'focus';
-    totalSec  = cfg.focus * MULT;
+    pomCount = 0;
+    todos = [];
+    nnItems = nnItems.map((i) => ({...i, done: false}));
+    nnStreak = 0;
+    mode = 'focus';
+    totalSec = cfg.focus * MULT;
     remaining = totalSec;
     updateAdjLabel();
     setClockState('idle');
@@ -44,7 +59,7 @@ async function hardReset() {
     renderDots();
     renderTodos();
     renderNN();
-    await api('PATCH', `/session/${deviceId}`, { pomCount: 0 });
+    await api('PATCH', `/session/${deviceId}`, {pomCount: 0});
     showToast('Everything reset.');
 }
 
@@ -81,15 +96,21 @@ async function initApp() {
 
     // Todos
     const fetchedTodos = await api('GET', `/todos/${deviceId}`);
-    if (fetchedTodos) { todos = fetchedTodos; renderTodos(); }
+    if (fetchedTodos) {
+        todos = fetchedTodos;
+        renderTodos();
+    }
 
     // Non-negotiables
     const nnData = await api('GET', `/nn/${deviceId}`);
     if (nnData) {
-        nnItems  = nnData.items;
+        nnItems = nnData.items;
         nnStreak = nnItems.reduce((max, i) => Math.max(max, i.streak || 0), 0);
         renderNN();
     }
+
+    // Routine
+    loadRoutine();
 }
 
 initApp();

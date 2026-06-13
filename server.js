@@ -8,6 +8,7 @@ const path = require('path');
 const todosRouter = require('./routes/todos');
 const nnRouter = require('./routes/nn');
 const sessionRouter = require('./routes/session');
+const routineRouter = require('./routes/routine');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -19,6 +20,7 @@ app.use(express.json());
 app.use('/api/todos', todosRouter);
 app.use('/api/nn', nnRouter);
 app.use('/api/session', sessionRouter);
+app.use('/api/routine', routineRouter);
 
 app.get('/api/health', (req, res) => {
     res.json({
@@ -30,14 +32,12 @@ app.get('/api/health', (req, res) => {
 // ── Static frontend ──
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Serve sw.js with correct Service Worker headers
 app.get('/sw.js', (req, res) => {
     res.setHeader('Content-Type', 'application/javascript');
     res.setHeader('Service-Worker-Allowed', '/');
     res.sendFile(path.join(__dirname, 'public', 'sw.js'));
 });
 
-// Fallback — SPA support
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });

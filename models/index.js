@@ -25,11 +25,31 @@ const nnSchema = new mongoose.Schema({
     createdAt: {type: Date, default: Date.now},
 });
 
-const RoutineEntry = require('./routine');
+const routineEntrySchema = new mongoose.Schema({
+    batch: {type: String, enum: ['preli', 'written'], required: true},
+    date: {type: String, required: true},
+    subject: {type: String, default: ''},
+    topic: {type: String, default: ''},
+    classTime: {type: String, default: ''},
+    examTopic: {type: String, default: ''},
+    entryType: {
+        type: String,
+        enum: ['class', 'exam', 'special', 'holiday', 'self-study'],
+        default: 'class',
+    },
+    specialLabel: {type: String, default: ''},
+    colorTag: {type: String, default: ''},
+});
 
-module.exports = {
-    Session: mongoose.model('Session', sessionSchema),
-    Todo: mongoose.model('Todo', todoSchema),
-    NN: mongoose.model('NN', nnSchema),
-    RoutineEntry,
-};
+routineEntrySchema.index({batch: 1, date: 1});
+
+// Prevent model re-registration in Vercel serverless environment
+const Session =
+    mongoose.models.Session || mongoose.model('Session', sessionSchema);
+const Todo = mongoose.models.Todo || mongoose.model('Todo', todoSchema);
+const NN = mongoose.models.NN || mongoose.model('NN', nnSchema);
+const RoutineEntry =
+    mongoose.models.RoutineEntry ||
+    mongoose.model('RoutineEntry', routineEntrySchema);
+
+module.exports = {Session, Todo, NN, RoutineEntry};

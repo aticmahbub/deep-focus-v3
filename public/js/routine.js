@@ -30,7 +30,7 @@ function isCurrentlyClassTime(classTime) {
     const start = new Date();
     start.setHours(hours, minutes, 0, 0);
     const end = new Date(start);
-    end.setHours(start.getHours() + 2);
+    end.setHours(start.getHours() + 3); // 3hr window
     return now >= start && now <= end;
 }
 
@@ -110,11 +110,9 @@ function buildColumnHtml(entries, batch) {
         return `<div class="rtn-empty">No schedule for this window.</div>`;
     }
 
-    // Links bar
-    const linksHtml = `
-    <div class="rtn-links">
-        ${cfg.zoom ? `<a href="${cfg.zoom}" target="_blank" class="rtn-link rtn-link-zoom">🔵 Zoom</a>` : ''}
-        ${cfg.meet ? `<a href="${cfg.meet}" target="_blank" class="rtn-link rtn-link-meet">🟢 Meet</a>` : ''}
+    // Sheet link at top
+    const sheetHtml = `
+    <div class="rtn-sheet-link">
         <a href="${cfg.sheet}" target="_blank" class="rtn-link rtn-link-sheet">📋 Full Routine</a>
     </div>`;
 
@@ -130,6 +128,15 @@ function buildColumnHtml(entries, batch) {
         .map((date) => {
             const isToday = date === routineToday;
             const dayLabel = routineDayLabel(date);
+
+            // Join links only for today's section
+            const joinLinksHtml = isToday
+                ? `
+        <div class="rtn-join-links">
+            ${cfg.zoom ? `<a href="${cfg.zoom}" target="_blank" class="rtn-link rtn-link-zoom">🔵 Zoom</a>` : ''}
+            ${cfg.meet ? `<a href="${cfg.meet}" target="_blank" class="rtn-link rtn-link-meet">🟢 Meet</a>` : ''}
+        </div>`
+                : '';
 
             const entriesHtml = grouped[date]
                 .map((e) => {
@@ -168,12 +175,13 @@ function buildColumnHtml(entries, batch) {
                 <span class="rtn-day-name">${dayLabel}</span>
                 <span class="rtn-day-date">${formatRtnDate(date)}</span>
             </div>
+            ${joinLinksHtml}
             <div class="rtn-entries">${entriesHtml}</div>
         </div>`;
         })
         .join('');
 
-    return linksHtml + daysHtml;
+    return sheetHtml + daysHtml;
 }
 
 function renderRoutine() {

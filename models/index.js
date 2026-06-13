@@ -43,13 +43,13 @@ const routineEntrySchema = new mongoose.Schema({
 
 routineEntrySchema.index({batch: 1, date: 1});
 
-// Prevent model re-registration in Vercel serverless environment
-const Session =
-    mongoose.models.Session || mongoose.model('Session', sessionSchema);
-const Todo = mongoose.models.Todo || mongoose.model('Todo', todoSchema);
-const NN = mongoose.models.NN || mongoose.model('NN', nnSchema);
-const RoutineEntry =
-    mongoose.models.RoutineEntry ||
-    mongoose.model('RoutineEntry', routineEntrySchema);
-
-module.exports = {Session, Todo, NN, RoutineEntry};
+// Use mongoose.models cache to prevent re-registration errors in serverless
+module.exports = {
+    Session:
+        mongoose.models.Session || mongoose.model('Session', sessionSchema),
+    Todo: mongoose.models.Todo || mongoose.model('Todo', todoSchema),
+    NN: mongoose.models.NN || mongoose.model('NN', nnSchema),
+    RoutineEntry:
+        mongoose.models.RoutineEntry ||
+        mongoose.model('RoutineEntry', routineEntrySchema),
+};

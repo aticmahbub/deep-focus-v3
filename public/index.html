@@ -54,11 +54,9 @@
             </div>
         </div>
 
-        <!-- APP -->
-        <!-- APP -->
-        <div class="main-section">
-            <!-- LEFT: TIMER -->
-            <div class="timer-col">
+        <!-- ROW 1: TIMER + TASKS + NON-NEGOTIABLES -->
+        <div class="app">
+            <div class="timer-section">
                 <div class="timer-card" id="timerCard">
                     <div class="break-badge" id="breakBadge">Break</div>
                     <div class="clock-wrap">
@@ -111,129 +109,137 @@
                 </div>
             </div>
 
-            <!-- RIGHT COL -->
-            <div class="right-col">
-                <!-- ROUTINE -->
-                <div class="routine-card">
-                    <div class="routine-head">
-                        <div class="routine-title">BCS Routine</div>
-                        <div class="rtn-toggle">
-                            <button
-                                class="rtn-btn active"
-                                id="rtnBtnPreli"
-                                onclick="switchBatch('preli')"
-                            >
-                                Preli
-                            </button>
-                            <button
-                                class="rtn-btn"
-                                id="rtnBtnWritten"
-                                onclick="switchBatch('written')"
-                            >
-                                Written
-                            </button>
-                        </div>
+            <div class="lists-section">
+                <!-- TODOS -->
+                <div class="todo-card">
+                    <div class="todo-head">
+                        <div class="todo-title">Tasks</div>
                     </div>
-                    <div class="rtn-sub">Previous · Today · Next 2 days</div>
-                    <div class="rtn-list" id="routineList"></div>
+                    <div
+                        class="nn-sub"
+                        style="
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                        "
+                    >
+                        <span>Your session to-dos</span>
+                        <span
+                            id="todoCount"
+                            style="color: var(--muted); font-size: 11px"
+                            >—</span
+                        >
+                    </div>
+                    <div class="todo-add">
+                        <input
+                            type="text"
+                            class="todo-input"
+                            id="todoInput"
+                            placeholder="Add a task..."
+                            onkeydown="if (event.key === 'Enter') addTodo();"
+                        />
+                        <button class="todo-add-btn" onclick="addTodo()">
+                            +
+                        </button>
+                    </div>
+                    <div class="todo-list" id="todoList"></div>
+                    <div class="todo-footer">
+                        <div class="prog">
+                            <div
+                                class="prog-fill"
+                                id="progFill"
+                                style="width: 0%"
+                            ></div>
+                        </div>
+                        <div class="prog-txt" id="progTxt">0 tasks</div>
+                        <button class="clear-btn" onclick="clearDone()">
+                            Clear done
+                        </button>
+                    </div>
                 </div>
 
-                <!-- LISTS -->
-                <div class="lists-section">
-                    <!-- TODOS -->
-                    <div class="todo-card">
-                        <div class="todo-head">
-                            <div class="todo-title">Tasks</div>
-                        </div>
-                        <div
-                            class="nn-sub"
-                            style="
-                                display: flex;
-                                justify-content: space-between;
-                                align-items: center;
-                            "
-                        >
-                            <span>Your session to-dos</span>
-                            <span
-                                id="todoCount"
-                                style="color: var(--muted); font-size: 11px"
-                                >—</span
-                            >
-                        </div>
-                        <div class="todo-add">
-                            <input
-                                type="text"
-                                class="todo-input"
-                                id="todoInput"
-                                placeholder="Add a task..."
-                                onkeydown="
-                                    if (event.key === 'Enter') addTodo();
-                                "
-                            />
-                            <button class="todo-add-btn" onclick="addTodo()">
-                                +
-                            </button>
-                        </div>
-                        <div class="todo-list" id="todoList"></div>
-                        <div class="todo-footer">
-                            <div class="prog">
-                                <div
-                                    class="prog-fill"
-                                    id="progFill"
-                                    style="width: 0%"
-                                ></div>
-                            </div>
-                            <div class="prog-txt" id="progTxt">0 tasks</div>
-                            <button class="clear-btn" onclick="clearDone()">
-                                Clear done
-                            </button>
-                        </div>
+                <!-- NON-NEGOTIABLES -->
+                <div class="nn-card">
+                    <div class="nn-head">
+                        <div class="nn-title">Non-Negotiables</div>
                     </div>
+                    <div
+                        class="nn-sub"
+                        style="
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                        "
+                    >
+                        <span id="nnResetBadge">Resets daily at midnight</span>
+                        <span id="nnStreak" class="nn-streak"></span>
+                    </div>
+                    <div class="nn-add">
+                        <input
+                            type="text"
+                            class="nn-input"
+                            id="nnInput"
+                            placeholder="Add a daily non-negotiable..."
+                            onkeydown="if (event.key === 'Enter') addNN();"
+                        />
+                        <button class="nn-add-btn" onclick="addNN()">+</button>
+                    </div>
+                    <div class="nn-list" id="nnList"></div>
+                    <div class="nn-footer">
+                        <div class="nn-prog">
+                            <div
+                                class="nn-prog-fill"
+                                id="nnProgFill"
+                                style="width: 0%"
+                            ></div>
+                        </div>
+                        <div class="nn-prog-txt" id="nnProgTxt">0 items</div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                    <!-- NON-NEGOTIABLES -->
-                    <div class="nn-card">
-                        <div class="nn-head">
-                            <div class="nn-title">Non-Negotiables</div>
-                        </div>
-                        <div
-                            class="nn-sub"
+        <!-- ROW 2: BCS ROUTINE (2 columns) -->
+        <div class="routine-section">
+            <div class="routine-section-head">
+                <div class="routine-section-line"></div>
+                <div class="routine-section-label">
+                    BCS Routine — Previous · Today · Next 2 days
+                </div>
+                <div class="routine-section-line"></div>
+            </div>
+            <div class="routine-cols">
+                <!-- PRELI -->
+                <div class="routine-col-card">
+                    <div class="routine-col-title">
+                        📘 Preli Batch
+                        <span
                             style="
-                                display: flex;
-                                justify-content: space-between;
-                                align-items: center;
+                                font-size: 10px;
+                                color: var(--muted);
+                                font-family: 'DM Mono', monospace;
+                                font-weight: 400;
                             "
+                            >9:00 PM</span
                         >
-                            <span id="nnResetBadge"
-                                >Resets daily at midnight</span
-                            >
-                            <span id="nnStreak" class="nn-streak"></span>
-                        </div>
-                        <div class="nn-add">
-                            <input
-                                type="text"
-                                class="nn-input"
-                                id="nnInput"
-                                placeholder="Add a daily non-negotiable..."
-                                onkeydown="if (event.key === 'Enter') addNN();"
-                            />
-                            <button class="nn-add-btn" onclick="addNN()">
-                                +
-                            </button>
-                        </div>
-                        <div class="nn-list" id="nnList"></div>
-                        <div class="nn-footer">
-                            <div class="nn-prog">
-                                <div
-                                    class="nn-prog-fill"
-                                    id="nnProgFill"
-                                    style="width: 0%"
-                                ></div>
-                            </div>
-                            <div class="nn-prog-txt" id="nnProgTxt">
-                                0 items
-                            </div>
-                        </div>
                     </div>
+                    <div class="rtn-list" id="routinePreli"></div>
+                </div>
+                <!-- WRITTEN -->
+                <div class="routine-col-card">
+                    <div class="routine-col-title">
+                        📗 Written Batch
+                        <span
+                            style="
+                                font-size: 10px;
+                                color: var(--muted);
+                                font-family: 'DM Mono', monospace;
+                                font-weight: 400;
+                            "
+                            >8:00 AM</span
+                        >
+                    </div>
+                    <div class="rtn-list" id="routineWritten"></div>
                 </div>
             </div>
         </div>
@@ -310,7 +316,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="insights-divider" style="margin-top: 28px">
                 <div class="insights-divider-line"></div>
                 <div class="insights-divider-label">Deep Work Rules</div>
@@ -379,7 +384,6 @@
             <span class="atic-name">Atic</span>
         </footer>
 
-        <!-- JS modules — order matters -->
         <script src="js/api.js"></script>
         <script src="js/sound.js"></script>
         <script src="js/timer.js"></script>

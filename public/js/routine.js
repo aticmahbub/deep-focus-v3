@@ -1,44 +1,58 @@
 // ── BCS ROUTINE ──
-let routineBatch = 'preli';
-let routineEntries = [];
+let routineEntriesPreli = [];
+let routineEntriesWritten = [];
 let routineToday = '';
 
+const BATCH_CONFIG = {
+    preli: {
+        zoom: 'https://zoom.us/j/98635016175?pwd=N8q1S65XhtqcbWXDJli8av2oSIOezo.1#success',
+        meet: 'https://meet.google.com/haw-gbkb-sue',
+        sheet: 'https://docs.google.com/spreadsheets/d/1tDF83zu5FHdYsDC_-lZVUv7gyQ1IdyfU9GbV9sIhIfo/edit?gid=0#gid=0',
+    },
+    written: {
+        meet: 'https://meet.google.com/omp-fkga-gvr',
+        sheet: 'https://docs.google.com/spreadsheets/d/19JwlJBgfR3TFoWcUKJy8pjb0KRBcXmWg5i7411JEWTE/edit?gid=1153290852#gid=1153290852',
+    },
+};
+
 function localDateStr() {
-    // Returns YYYY-MM-DD in the user's LOCAL timezone (not UTC)
     const d = new Date();
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-    return `${y}-${m}-${day}`;
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+function isCurrentlyClassTime(classTime) {
+    if (!classTime) return false;
+    const now = new Date();
+    const [time, period] = classTime.split(' ');
+    let [hours, minutes] = time.split(':').map(Number);
+    if (period === 'PM' && hours !== 12) hours += 12;
+    if (period === 'AM' && hours === 12) hours = 0;
+    const start = new Date();
+    start.setHours(hours, minutes, 0, 0);
+    const end = new Date(start);
+    end.setHours(start.getHours() + 2);
+    return now >= start && now <= end;
 }
 
 async function loadRoutine() {
     const today = localDateStr();
-    const data = await api(
-        'GET',
-        `/routine/${routineBatch}/window?date=${today}`,
-    );
-    if (!data) return;
-    routineEntries = data.entries;
-    routineToday = data.today;
+    const [preliData, writtenData] = await Promise.all([
+        api('GET', `/routine/preli/window?date=${today}`),
+        api('GET', `/routine/written/window?date=${today}`),
+    ]);
+    if (preliData) {
+        routineEntriesPreli = preliData.entries;
+        routineToday = preliData.today;
+    }
+    if (writtenData) {
+        routineEntriesWritten = writtenData.entries;
+    }
     renderRoutine();
 }
 
-function switchBatch(batch) {
-    routineBatch = batch;
-    document
-        .getElementById('rtnBtnPreli')
-        .classList.toggle('active', batch === 'preli');
-    document
-        .getElementById('rtnBtnWritten')
-        .classList.toggle('active', batch === 'written');
-    loadRoutine();
-}
-
 function routineDayLabel(dateStr) {
-    const today = routineToday;
     const d = new Date(dateStr + 'T00:00:00Z');
-    const t = new Date(today + 'T00:00:00Z');
+    const t = new Date(routineToday + 'T00:00:00Z');
     const diff = Math.round((d - t) / 86400000);
     if (diff === -1) return 'Yesterday';
     if (diff === 0) return 'Today';
@@ -47,8 +61,8 @@ function routineDayLabel(dateStr) {
     return dateStr;
 }
 
-function routineTypeIcon(entry) {
-    switch (entry.entryType) {
+function routineTypeIcon(e) {
+    switch (e.entryType) {
         case 'exam':
             return '📝';
         case 'self-study':
@@ -62,71 +76,11 @@ function routineTypeIcon(entry) {
     }
 }
 
-function routineColorClass(entry) {
-    if (entry.colorTag === 'teal' || entry.colorTag === 'green')
-        return 'rtn-accent';
-    if (entry.colorTag === 'yellow') return 'rtn-yellow';
-    if (entry.entryType === 'holiday') return 'rtn-holiday';
+function routineColorClass(e) {
+    if (e.colorTag === 'teal' || e.colorTag === 'green') return 'rtn-accent';
+    if (e.colorTag === 'yellow') return 'rtn-yellow';
+    if (e.entryType === 'holiday') return 'rtn-holiday';
     return '';
-}
-
-function renderRoutine() {
-    const el = document.getElementById('routineList');
-    if (!routineEntries.length) {
-        el.innerHTML = `<div class="rtn-empty">No schedule found for this window.</div>`;
-        return;
-    }
-
-    // Group entries by date
-    const grouped = {};
-    routineEntries.forEach((e) => {
-        if (!grouped[e.date]) grouped[e.date] = [];
-        grouped[e.date].push(e);
-    });
-
-    el.innerHTML = Object.keys(grouped)
-        .sort()
-        .map((date) => {
-            const isToday = date === routineToday;
-            const dayLabel = routineDayLabel(date);
-            const entries = grouped[date];
-
-            const entriesHtml = entries
-                .map((e) => {
-                    const colorCls = routineColorClass(e);
-                    const icon = routineTypeIcon(e);
-
-                    if (e.specialLabel) {
-                        return `
-                <div class="rtn-entry rtn-special ${colorCls}">
-                    <span class="rtn-icon">${icon}</span>
-                    <span class="rtn-special-label">${e.specialLabel}</span>
-                </div>`;
-                    }
-
-                    return `
-            <div class="rtn-entry ${colorCls}">
-                <span class="rtn-icon">${icon}</span>
-                <div class="rtn-body">
-                    <div class="rtn-subject">${e.subject || ''}</div>
-                    ${e.topic ? `<div class="rtn-topic">${e.topic}</div>` : ''}
-                    ${e.classTime ? `<div class="rtn-time">⏰ Class: ${e.classTime}</div>` : ''}
-                    ${e.examTopic ? `<div class="rtn-exam-topic">📝 ${e.examTopic}</div>` : ''}
-                </div>
-            </div>`;
-                })
-                .join('');
-
-            return `
-        <div class="rtn-day ${isToday ? 'rtn-today' : ''}">
-            <div class="rtn-day-label">
-                <span class="rtn-day-name">${dayLabel}</span>
-                <span class="rtn-day-date">${formatRtnDate(date)}</span>
-            </div>
-            <div class="rtn-entries">${entriesHtml}</div>
-        </div>`;
-        })
-        .join('');
 }
 
 function formatRtnDate(dateStr) {
@@ -148,3 +102,92 @@ function formatRtnDate(dateStr) {
     ];
     return `${days[d.getUTCDay()]}, ${months[d.getUTCMonth()]} ${d.getUTCDate()}`;
 }
+
+function buildColumnHtml(entries, batch) {
+    const cfg = BATCH_CONFIG[batch];
+
+    if (!entries.length) {
+        return `<div class="rtn-empty">No schedule for this window.</div>`;
+    }
+
+    // Links bar
+    const linksHtml = `
+    <div class="rtn-links">
+        ${cfg.zoom ? `<a href="${cfg.zoom}" target="_blank" class="rtn-link rtn-link-zoom">🔵 Zoom</a>` : ''}
+        ${cfg.meet ? `<a href="${cfg.meet}" target="_blank" class="rtn-link rtn-link-meet">🟢 Meet</a>` : ''}
+        <a href="${cfg.sheet}" target="_blank" class="rtn-link rtn-link-sheet">📋 Full Routine</a>
+    </div>`;
+
+    // Group by date
+    const grouped = {};
+    entries.forEach((e) => {
+        if (!grouped[e.date]) grouped[e.date] = [];
+        grouped[e.date].push(e);
+    });
+
+    const daysHtml = Object.keys(grouped)
+        .sort()
+        .map((date) => {
+            const isToday = date === routineToday;
+            const dayLabel = routineDayLabel(date);
+
+            const entriesHtml = grouped[date]
+                .map((e) => {
+                    const colorCls = routineColorClass(e);
+                    const icon = routineTypeIcon(e);
+                    const live = isToday && isCurrentlyClassTime(e.classTime);
+
+                    if (e.specialLabel) {
+                        return `
+                <div class="rtn-entry rtn-special ${colorCls} ${live ? 'rtn-live' : ''}">
+                    <span class="rtn-icon">${icon}</span>
+                    <span class="rtn-special-label">${e.specialLabel}</span>
+                    ${live ? '<span class="rtn-live-badge">LIVE</span>' : ''}
+                </div>`;
+                    }
+
+                    return `
+            <div class="rtn-entry ${colorCls} ${live ? 'rtn-live' : ''}">
+                <span class="rtn-icon">${icon}</span>
+                <div class="rtn-body">
+                    <div class="rtn-subject-row">
+                        <span class="rtn-subject">${e.subject || ''}</span>
+                        ${live ? '<span class="rtn-live-badge">LIVE</span>' : ''}
+                    </div>
+                    ${e.topic ? `<div class="rtn-topic">${e.topic}</div>` : ''}
+                    ${e.classTime ? `<div class="rtn-time">⏰ ${e.classTime}</div>` : ''}
+                    ${e.examTopic ? `<div class="rtn-exam-topic">📝 ${e.examTopic}</div>` : ''}
+                </div>
+            </div>`;
+                })
+                .join('');
+
+            return `
+        <div class="rtn-day ${isToday ? 'rtn-today' : ''}">
+            <div class="rtn-day-label">
+                <span class="rtn-day-name">${dayLabel}</span>
+                <span class="rtn-day-date">${formatRtnDate(date)}</span>
+            </div>
+            <div class="rtn-entries">${entriesHtml}</div>
+        </div>`;
+        })
+        .join('');
+
+    return linksHtml + daysHtml;
+}
+
+function renderRoutine() {
+    document.getElementById('routinePreli').innerHTML = buildColumnHtml(
+        routineEntriesPreli,
+        'preli',
+    );
+    document.getElementById('routineWritten').innerHTML = buildColumnHtml(
+        routineEntriesWritten,
+        'written',
+    );
+}
+
+// Re-check live status every minute
+setInterval(() => {
+    if (routineToday) renderRoutine();
+}, 60000);

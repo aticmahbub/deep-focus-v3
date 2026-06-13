@@ -30,23 +30,26 @@ function isCurrentlyClassTime(classTime) {
     const start = new Date();
     start.setHours(hours, minutes, 0, 0);
     const end = new Date(start);
-    end.setHours(start.getHours() + 3); // 3hr window
+    end.setHours(start.getHours() + 3);
     return now >= start && now <= end;
 }
 
 async function loadRoutine() {
     const today = localDateStr();
+    // Fetch today + next 2 days only (from=today, to=today+2)
+    const d = new Date(today + 'T00:00:00Z');
+    const next2 = new Date(d);
+    next2.setUTCDate(next2.getUTCDate() + 2);
+    const toDate = next2.toISOString().slice(0, 10);
+
     const [preliData, writtenData] = await Promise.all([
-        api('GET', `/routine/preli/window?date=${today}`),
-        api('GET', `/routine/written/window?date=${today}`),
+        api('GET', `/routine/preli/range?from=${today}&to=${toDate}`),
+        api('GET', `/routine/written/range?from=${today}&to=${toDate}`),
     ]);
-    if (preliData) {
-        routineEntriesPreli = preliData.entries;
-        routineToday = preliData.today;
-    }
-    if (writtenData) {
-        routineEntriesWritten = writtenData.entries;
-    }
+
+    routineToday = today;
+    routineEntriesPreli = preliData || [];
+    routineEntriesWritten = writtenData || [];
     renderRoutine();
 }
 
@@ -54,7 +57,6 @@ function routineDayLabel(dateStr) {
     const d = new Date(dateStr + 'T00:00:00Z');
     const t = new Date(routineToday + 'T00:00:00Z');
     const diff = Math.round((d - t) / 86400000);
-    if (diff === -1) return 'Yesterday';
     if (diff === 0) return 'Today';
     if (diff === 1) return 'Tomorrow';
     if (diff === 2) return 'In 2 days';
@@ -107,10 +109,13 @@ function buildColumnHtml(entries, batch) {
     const cfg = BATCH_CONFIG[batch];
 
     if (!entries.length) {
-        return `<div class="rtn-empty">No schedule for this window.</div>`;
+        return `
+        <div class="rtn-sheet-link">
+            <a href="${cfg.sheet}" target="_blank" class="rtn-link rtn-link-sheet">📋 Full Routine</a>
+        </div>
+        <div class="rtn-empty">No schedule for this window.</div>`;
     }
 
-    // Sheet link at top
     const sheetHtml = `
     <div class="rtn-sheet-link">
         <a href="${cfg.sheet}" target="_blank" class="rtn-link rtn-link-sheet">📋 Full Routine</a>
@@ -129,7 +134,7 @@ function buildColumnHtml(entries, batch) {
             const isToday = date === routineToday;
             const dayLabel = routineDayLabel(date);
 
-            // Join links only for today's section
+            // Join links only for today
             const joinLinksHtml = isToday
                 ? `
         <div class="rtn-join-links">

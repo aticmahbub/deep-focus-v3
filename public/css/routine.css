@@ -27,12 +27,12 @@
     white-space: nowrap;
 }
 
-/* Two equal columns */
+/* Two equal columns — same height */
 .routine-cols {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 20px;
-    align-items: start;
+    align-items: stretch; /* equal height */
 }
 
 /* Each column card */
@@ -44,6 +44,7 @@
     padding: 20px;
     display: flex;
     flex-direction: column;
+    min-height: 0;
 }
 
 .routine-col-title {
@@ -55,6 +56,7 @@
     display: flex;
     align-items: baseline;
     gap: 8px;
+    flex-shrink: 0;
 }
 
 .routine-col-title span {
@@ -67,6 +69,7 @@
 /* Sheet link */
 .rtn-sheet-link {
     margin-bottom: 12px;
+    flex-shrink: 0;
 }
 
 /* Join links inside today block */
@@ -115,14 +118,15 @@
     color: var(--accent);
 }
 
-/* Scrollable list */
+/* Scrollable list — fills remaining card height */
 .rtn-list {
     display: flex;
     flex-direction: column;
     gap: 8px;
     overflow-y: auto;
-    max-height: 420px;
+    flex: 1;
     padding-right: 2px;
+    min-height: 0;
 }
 
 /* Day block */
@@ -130,6 +134,7 @@
     border: 1px solid var(--border);
     border-radius: 10px;
     overflow: hidden;
+    flex-shrink: 0;
 }
 
 .rtn-day.rtn-today {
@@ -306,9 +311,6 @@ body.theme-green .rtn-live {
     }
     .routine-cols {
         grid-template-columns: 1fr;
-    }
-    .rtn-list {
-        max-height: 300px;
     }
     .routine-col-title {
         font-size: 1rem;
